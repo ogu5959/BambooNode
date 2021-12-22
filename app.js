@@ -5,7 +5,7 @@ const agent    = require('./routes/agent')
 const app      = express()
 
 nunjucks.configure('template', {
-    autoescape : true,  // 
+    autoescape : true,  // 이스케이프 활성화 XSS 공격 방지
     express : app       // app 객체 연결
 })
 
