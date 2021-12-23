@@ -9,7 +9,14 @@ nunjucks.configure('template', {
     express : app       // app 객체 연결
 })
 
-app.use('/agent', agent)
+// Middleware Test 0
+function vipMiddleware(req, res, next) {
+    console.log("VIP Middleware")
+    next()
+}  
+
+// Middleware
+app.use('/agent', vipMiddleware, agent)
 
 app.get('/', (req, res) => {
     res.send('Hello Express!')
