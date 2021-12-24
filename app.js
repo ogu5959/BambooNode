@@ -1,6 +1,8 @@
-const express  = require('express')
-const nunjucks = require('nunjucks')
-const agent    = require('./routes/agent')
+const express    = require('express')
+const logger     = require('morgan')
+const nunjucks   = require('nunjucks')
+const bodyParser = require('body-parser')
+const agent      = require('./routes/agent')
 
 const app      = express()
 
@@ -16,7 +18,10 @@ function vipMiddleware(req, res, next) {
 }  
 
 // Middleware
-app.use('/agent', vipMiddleware, agent)
+app.use(logger('dev'))                              // 요청 정보 기록
+app.use(bodyParser.json())                          // json 형식으로 Parsing
+app.use(bodyParser.urlencoded({ extended: false })) // node.js 기본 내장된 queryString 사용
+app.use('/agent', vipMiddleware, agent)             // /agent Routing
 
 app.get('/', (req, res) => {
     res.send('Hello Express!')

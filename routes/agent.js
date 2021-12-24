@@ -24,4 +24,12 @@ router.get('/list', firstMiddleware, secondMiddleware, (req, res) => {
     })
 });
 
+router.get('/list/write', ( req , res) => {
+    res.render( 'agent/write.html');
+});
+
+router.post('/list/write', (req, res) => {
+    console.log(req.body)
+})
+
 module.exports = router;
