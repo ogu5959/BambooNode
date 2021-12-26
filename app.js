@@ -23,6 +23,14 @@ app.use(bodyParser.json())                          // json 형식으로 Parsing
 app.use(bodyParser.urlencoded({ extended: false })) // node.js 기본 내장된 queryString 사용
 app.use('/agent', vipMiddleware, agent)             // /agent Routing
 
+app.use( (req, res, _) => {
+    res.status(400).render('common/404.html')
+})
+
+app.use( (req, res, _) => {
+    res.status(500).render('common/500.html')
+})
+
 app.get('/', (req, res) => {
     res.send('Hello Express!')
 })
