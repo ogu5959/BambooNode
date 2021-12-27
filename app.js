@@ -2,39 +2,61 @@ const express    = require('express')
 const logger     = require('morgan')
 const nunjucks   = require('nunjucks')
 const bodyParser = require('body-parser')
-const agent      = require('./routes/agent')
 
-const app      = express()
+class App {
 
-nunjucks.configure('template', {
-    autoescape : true,  // 이스케이프 활성화 XSS 공격 방지
-    express : app       // app 객체 연결
-})
+    constructor() {
+        this.app = express()
 
-// Middleware Test 0
-function vipMiddleware(req, res, next) {
-    console.log("VIP Middleware")
-    next()
-}  
+        // ViewEngine
+        this.setViewEngine()
 
-// Middleware
-app.use(logger('dev'))                              // 요청 정보 기록
-app.use(bodyParser.json())                          // json 형식으로 Parsing
-app.use(bodyParser.urlencoded({ extended: false })) // node.js 기본 내장된 queryString 사용
-app.use('/agent', vipMiddleware, agent)             // /agent Routing
+        // MiddleWare
+        this.setMiddleWare()
 
-app.use( (req, res, _) => {
-    res.status(400).render('common/404.html')
-})
+        // Router
+        this.getRouter()
 
-app.use( (req, res, _) => {
-    res.status(500).render('common/500.html')
-})
+        // 404 ErrorHandler
+        this.status404()
 
-app.get('/', (req, res) => {
-    res.send('Hello Express!')
-})
+        // 500 ErrorHandler
+        this.errorHandler()
+    }
 
-app.listen(3000, () => {
-    console.log('Express server on port 3000!')
-})
+    // ViewEngine
+    setViewEngine() {
+        nunjucks.configure('template', {
+            autoescape : true,  // 이스케이프 활성화 XSS 공격 방지
+            express : this.app  // app 객체 연결
+        })
+    }
+
+    // MiddleWare
+    setMiddleWare() {
+        this.app.use(logger('dev'))                              // 요청 정보 기록
+        this.app.use(bodyParser.json())                          // json 형식으로 Parsing
+        this.app.use(bodyParser.urlencoded({ extended: false })) // node.js 기본 내장된 queryString 사용
+    }
+
+    // Router
+    getRouter (){
+        this.app.use(require('./routers'))
+    }
+
+    // 404 ErrorHandler
+    status404() {        
+        this.app.use( ( req , res, _ ) => {
+            res.status(404).render('common/404.html')
+        })
+    }
+
+    // 500 ErrorHandler
+    errorHandler() {
+        this.app.use( (err, req, res,  _ ) => {
+            res.status(500).render('common/500.html')
+        })
+    }
+}
+
+module.exports = new App().app
